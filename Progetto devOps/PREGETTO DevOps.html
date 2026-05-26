@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Black Friday — QuickLaunch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --charcoal: #0D0E12;
+      --white: #FFFFFF;
+      --lime: #CCFF00;
+      --lime-dim: rgba(204, 255, 0, 0.08);
+      --lime-glow: rgba(204, 255, 0, 0.35);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--charcoal);
+      color: var(--white);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.032;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── GRID LINES ─── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(204,255,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(204,255,0,0.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── LAYOUT ─── */
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 60px;
+      border-bottom: 1px solid rgba(204,255,0,0.1);
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.12em;
+      color: var(--lime);
+      text-decoration: none;
+    }
+
+    .nav-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      background: var(--lime);
+      padding: 6px 14px;
+      border-radius: 2px;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 40px 60px;
+      position: relative;
+    }
+
+    /* big glowing orb */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(204,255,0,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%,-50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%,-50%) scale(1.12); }
+    }
+
+    /* discount badge */
+    .discount-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--lime);
+      border: 1px solid rgba(204,255,0,0.3);
+      padding: 10px 22px;
+      border-radius: 2px;
+      margin-bottom: 40px;
+      background: var(--lime-dim);
+      animation: fadeUp 0.9s 0.2s ease both;
+      position: relative;
+      z-index: 2;
+    }
+    .discount-tag::before {
+      content: '';
+      display: block;
+      width: 7px; height: 7px;
+      background: var(--lime);
+      border-radius: 50%;
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; } 50% { opacity: 0.2; }
+    }
+
+    /* main title */
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 11vw, 160px);
+      line-height: 0.92;
+      letter-spacing: 0.01em;
+      color: var(--white);
+      animation: fadeUp 0.9s 0.35s ease both;
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+    }
+
+    .hero-title .accent {
+      color: var(--lime);
+      display: inline-block;
+      position: relative;
+    }
+
+    /* scratch-through line on -50% */
+    .hero-title .strike-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .hero-title .strike-wrap::after {
+      content: '';
+      position: absolute;
+      left: -4px; right: -4px;
+      top: 48%;
+      height: 5px;
+      background: var(--lime);
+      transform: rotate(-2deg);
+      animation: strikeIn 0.6s 1.2s ease both;
+      transform-origin: left;
+    }
+    @keyframes strikeIn {
+      from { scaleX: 0; opacity: 0; }
+      to { scaleX: 1; opacity: 1; }
+    }
+
+    /* subtitle */
+    .hero-sub {
+      margin-top: 36px;
+      font-size: clamp(15px, 2vw, 19px);
+      font-weight: 400;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.6);
+      max-width: 580px;
+      animation: fadeUp 0.9s 0.5s ease both;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-sub strong {
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    /* CTA */
+    .cta-wrap {
+      margin-top: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      animation: fadeUp 0.9s 0.65s ease both;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      background: var(--lime);
+      border: none;
+      padding: 22px 52px;
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 40px rgba(204,255,0,0.25);
+      text-decoration: none;
+    }
+    .btn-main::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .btn-main:hover::before { transform: translateX(100%); }
+    .btn-main:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 60px rgba(204,255,0,0.45);
+    }
+    .btn-main:active { transform: translateY(0) scale(0.99); }
+
+    .btn-arrow {
+      font-size: 20px;
+      transition: transform 0.2s ease;
+    }
+    .btn-main:hover .btn-arrow { transform: translateX(4px); }
+
+    .cta-note {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.1em;
+    }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(204,255,0,0.2), transparent);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 40px 60px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.12em;
+      color: rgba(204,255,0,0.5);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .footer-links a {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--lime); }
+
+    .footer-legal {
+      font-size: 11.5px;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.28);
+      font-family: 'JetBrains Mono', monospace;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 24px;
+    }
+    .footer-legal p + p { margin-top: 2px; }
+
+    /* ─── PROMO CODE SECTION ─── */
+    .promo-section {
+      padding: 70px 40px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.9s 0.5s ease both;
+    }
+
+    .promo-heading {
+      text-align: center;
+    }
+    .promo-heading .promo-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(204,255,0,0.7);
+      display: block;
+      margin-bottom: 12px;
+    }
+    .promo-heading h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1;
+      color: var(--white);
+    }
+    .promo-heading h2 span { color: var(--lime); }
+
+    .promo-box {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(204,255,0,0.15);
+      border-radius: 6px;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .promo-box:focus-within {
+      border-color: rgba(204,255,0,0.45);
+      box-shadow: 0 0 40px rgba(204,255,0,0.08);
+    }
+    .promo-box.success {
+      border-color: var(--lime);
+      box-shadow: 0 0 60px rgba(204,255,0,0.18);
+    }
+
+    .promo-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+    }
+
+    .promo-input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .promo-input {
+      flex: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 4px;
+      padding: 16px 20px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      caret-color: var(--lime);
+    }
+    .promo-input::placeholder {
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.15em;
+    }
+    .promo-input:focus {
+      border-color: rgba(204,255,0,0.5);
+      background: rgba(204,255,0,0.04);
+    }
+    .promo-input.error {
+      border-color: #ff4d4d;
+      animation: shake 0.4s ease;
+    }
+    .promo-input.valid {
+      border-color: var(--lime);
+      background: rgba(204,255,0,0.06);
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+
+    .btn-apply {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      background: var(--lime);
+      border: none;
+      border-radius: 4px;
+      padding: 0 28px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+      box-shadow: 0 0 20px rgba(204,255,0,0.2);
+    }
+    .btn-apply:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 32px rgba(204,255,0,0.4);
+    }
+    .btn-apply:active { transform: scale(0.97); }
+    .btn-apply:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .promo-feedback {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      min-height: 20px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .promo-feedback.err  { color: #ff6b6b; }
+    .promo-feedback.ok   { color: var(--lime); }
+
+    /* SUCCESS BANNER */
+    .success-banner {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+      animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .success-banner.show { display: flex; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .success-icon {
+      font-size: 44px;
+      line-height: 1;
+    }
+    .success-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .success-text {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.6;
+    }
+    .success-code-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      color: var(--charcoal);
+      background: var(--lime);
+      padding: 10px 28px;
+      border-radius: 3px;
+      margin-top: 4px;
+    }
+
+    /* ─── KEYFRAMES ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .hero { padding: 60px 24px 40px; }
+      footer { padding: 32px 24px; }
+      .footer-top { flex-direction: column; gap: 20px; align-items: flex-start; }
+      .footer-links { flex-wrap: wrap; gap: 16px; }
+    }
+
+    /* CURSOR ELEMENT STYLES */
+    #cursor, #cursorRing {
+      position: fixed;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      border-radius: 50%;
+      transition: width 0.2s, height 0.2s;
+    }
+    #cursor {
+      width: 12px;
+      height: 12px;
+      background: var(--lime);
+    }
+    #cursorRing {
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(204, 255, 0, 0.4);
+    }
+    @media (max-width: 1024px) {
+      #cursor, #cursorRing { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursorRing"></div>
+
+  <div class="grid-bg"></div>
+
+  <div class="page-wrap">
+
+    <nav>
+      <a href="#" class="logo">QuickLaunch</a>
+      <span class="nav-badge">Black Friday 2026</span>
+    </nav>
+
+    <section class="hero">
+      <div class="discount-tag">
+        Offerta a tempo limitato — scade a mezzanotte
+      </div>
+
+      <h1 class="hero-title">
+        Decolla Verso<br>
+        il Black Friday:<br>
+        <span class="accent strike-wrap">-50%</span>
+        su Tutto
+      </h1>
+
+      <p class="hero-sub">
+        Non aspettare il 2027.<br>
+        Potenzia il tuo business oggi con le <strong>offerte esclusive di QuickLaunch</strong>.<br>
+        La promo scade a mezzanotte.
+      </p>
+
+      <div class="cta-wrap">
+        <a href="#" class="btn-main">
+          ASSICURATI L'OFFERTA ORA
+          <span class="btn-arrow">→</span>
+        </a>
+        <span class="cta-note">Nessuna carta richiesta · Attivazione immediata</span>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="promo-section">
+      <div class="promo-heading">
+        <span class="promo-eyebrow">Codice Sconto</span>
+        <h2>Hai un codice? <span>Usalo ora.</span></h2>
+      </div>
+
+      <div class="promo-box" id="promoBox">
+
+        <div id="promoForm">
+          <div class="promo-label">Inserisci il tuo codice promozionale</div>
+          <div class="promo-input-row">
+            <input
+              class="promo-input"
+              id="promoInput"
+              type="text"
+              placeholder="ES. BLACK50"
+              maxlength="20"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="btn-apply" id="promoBtn" onclick="applyCode()">APPLICA</button>
+          </div>
+          <div class="promo-feedback" id="promoFeedback"></div>
+        </div>
+
+        <div class="success-banner" id="successBanner">
+          <div class="success-icon">🚀</div>
+          <div class="success-title">( codice sconto applicato )</div>
+          <div class="success-code-pill" id="successCodeLabel"></div>
+          <div class="success-text">Il <strong>-50% su tutto</strong> è stato aggiunto correttamente al tuo account.<br>Ora completa l'acquisto e decolla.</div>
+        </div>
+
+      </div>
+
+      <p style="font-size:12px;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace;letter-spacing:0.08em;text-align:center;">
+        Il codice è valido una sola volta per account · Scade a mezzanotte
+      </p>
+    </section>
+
+    <div class="divider"></div>
+
+    <footer>
+      <div class="footer-top">
+        <span class="footer-logo">QuickLaunch</span>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Termini e Condizioni</a></li>
+        </ul>
+      </div>
+      <div class="footer-legal">
+        <p>© 2026 QuickLaunch S.r.l. Tutti i diritti riservati.</p>
+        <p>Sede Legale: Via dell'Innovazione n. 42, 20121 Milano (MI)</p>
+        <p>Capitale Sociale: € 10.000,00 i.v. — Codice Fiscale e Partita IVA: 12345678901</p>
+        <p>REA: MI - 9876543 — PEC: quicklaunch@legalmail.it</p>
+      </div>
+    </footer>
+
+  </div><script>
+    /* ── Custom cursor ── */
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+    function animCursor() {
+      if(cursor && ring) {
+        cursor.style.left = mx + 'px';
+        cursor.style.top  = my + 'px';
+        rx += (mx - rx) * 0.14;
+        ry += (my - ry) * 0.14;
+        ring.style.left = rx + 'px';
+        ring.style.top  = ry + 'px';
+      }
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+
+    document.querySelectorAll('a, button, .btn-main').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        if(cursor && ring) {
+          cursor.style.width  = '20px';
+          cursor.style.height = '20px';
+          ring.style.width    = '52px';
+          ring.style.height   = '52px';
+        }
+      });
+      el.addEventListener('mouseleave', () => {
+        if(cursor && ring) {
+          cursor.style.width  = '12px';
+          cursor.style.height = '12px';
+          ring.style.width    = '36px';
+          ring.style.height   = '36px';
+        }
+      });
+    });
+
+    /* ── Promo Code ── */
+    const VALID_CODES = ['BLACK50', 'QUICKLAUNCH50', 'DECOLLA50', 'BF2026'];
+
+    function applyCode() {
+      const input    = document.getElementById('promoInput');
+      const feedback = document.getElementById('promoFeedback');
+      const box      = document.getElementById('promoBox');
+      const code     = input.value.trim().toUpperCase();
+
+      if (!code) {
+        feedback.textContent = '⚠ Inserisci un codice prima di procedere.';
+        feedback.className   = 'promo-feedback err';
+        input.classList.add('error');
+        setTimeout(() => input.classList.remove('error'), 500);
+        return;
+      }
+
+      if (VALID_CODES.includes(code)) {
+        // SUCCESS
+        input.classList.remove('error');
+        input.classList.add('valid');
+        box.classList.add('success');
+        feedback.textContent = '';
+
+        setTimeout(() => {
+          document.getElementById('promoForm').style.display = 'none';
+          document.getElementById('successCodeLabel').textContent = code;
+          const banner = document.getElementById('successBanner');
+          banner.classList.add('show');
+        }, 400);
+
+      } else {
+        input.classList.remove('valid');
+        input.classList.add('error');
+        feedback.textContent = '✕ Codice non valido. Riprova o contatta il supporto.';
+        feedback.className   = 'promo-feedback err';
+        setTimeout(() => input.classList.remove('error'), 500);
+      }
+    }
+
+    // Also trigger on Enter
+    document.getElementById('promoInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') applyCode();
+    });
+
+    // Clear error state on typing
+    document.getElementById('promoInput').addEventListener('input', () => {
+      document.getElementById('promoFeedback').textContent = '';
+      document.getElementById('promoInput').classList.remove('error');
+    });
+  </script>
+</body>
+</html>

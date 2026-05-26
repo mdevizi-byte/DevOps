@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Black Friday — QuickLaunch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursorRing"></div>
+
+  <div class="grid-bg"></div>
+
+  <div class="page-wrap">
+
+    <nav>
+      <a href="#" class="logo">QuickLaunch</a>
+      <span class="nav-badge">Black Friday 2026</span>
+    </nav>
+
+    <section class="hero">
+      <div class="discount-tag">
+        Offerta a tempo limitato — scade a mezzanotte
+      </div>
+
+      <h1 class="hero-title">
+        Decolla Verso<br>
+        il Black Friday:<br>
+        <span class="accent strike-wrap">-50%</span>
+        su Tutto
+      </h1>
+
+      <p class="hero-sub">
+        Non aspettare il 2027.<br>
+        Potenzia il tuo business oggi con le <strong>offerte esclusive di QuickLaunch</strong>.<br>
+        La promo scade a mezzanotte.
+      </p>
+
+      <div class="cta-wrap">
+        <a href="#" class="btn-main">
+          ASSICURATI L'OFFERTA ORA
+          <span class="btn-arrow">→</span>
+        </a>
+        <span class="cta-note">Nessuna carta richiesta · Attivazione immediata</span>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="promo-section">
+      <div class="promo-heading">
+        <span class="promo-eyebrow">Codice Sconto</span>
+        <h2>Hai un codice? <span>Usalo ora.</span></h2>
+      </div>
+
+      <div class="promo-box" id="promoBox">
+
+        <div id="promoForm">
+          <div class="promo-label">Inserisci il tuo codice promozionale</div>
+          <div class="promo-input-row">
+            <input
+              class="promo-input"
+              id="promoInput"
+              type="text"
+              placeholder="ES. BLACK50"
+              maxlength="20"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="btn-apply" id="promoBtn" onclick="applyCode()">APPLICA</button>
+          </div>
+          <div class="promo-feedback" id="promoFeedback"></div>
+        </div>
+
+        <div class="success-banner" id="successBanner">
+          <div class="success-icon">🚀</div>
+          <div class="success-title">( codice sconto applicato )</div>
+          <div class="success-code-pill" id="successCodeLabel"></div>
+          <div class="success-text">Il <strong>-50% su tutto</strong> è stato aggiunto correttamente al tuo account.<br>Ora completa l'acquisto e decolla.</div>
+        </div>
+
+      </div>
+
+      <p style="font-size:12px;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace;letter-spacing:0.08em;text-align:center;">
+        Il codice è valido una sola volta per account · Scade a mezzanotte
+      </p>
+    </section>
+
+    <div class="divider"></div>
+
+    <footer>
+      <div class="footer-top">
+        <span class="footer-logo">QuickLaunch</span>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Termini e Condizioni</a></li>
+        </ul>
+      </div>
+      <div class="footer-legal">
+        <p>© 2026 QuickLaunch S.r.l. Tutti i diritti riservati.</p>
+        <p>Sede Legale: Via dell'Innovazione n. 42, 20121 Milano (MI)</p>
+        <p>Capitale Sociale: € 10.000,00 i.v. — Codice Fiscale e Partita IVA: 12345678901</p>
+        <p>REA: MI - 9876543 — PEC: quicklaunch@legalmail.it</p>
+      </div>
+    </footer>
+
+  </div><script src="script.js"></script>
+</body>
+</html>
