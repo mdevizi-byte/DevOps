@@ -33,7 +33,7 @@ jobs:
             "Progetto devOps/**/*.html"
 
   build_docker:
-    name: test-sito
+    name: Build Docker image
     needs: validate_html
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
