@@ -1,0 +1,93 @@
+name: Static site CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate_html:
+    name: Validate HTML and links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run HTMLHint
+        run: npx --yes htmlhint "Progetto devOps/**/*.html"
+
+      - name: Check broken links
+        uses: lycheeverse/lychee-action@v2.5.0
+        with:
+          args: >-
+            --verbose
+            --no-progress
+            --accept 200,206,301,302,303,307,308,403,429
+            "Progetto devOps/**/*.html"
+
+  build_docker:
+    name: test-sito
+    needs: validate_html
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/mdevizi-byte/devops:latest
+            ghcr.io/mdevizi-byte/devops:${{ github.sha }}
+
+  deploy_pages:
+    name: Deploy to GitHub Pages
+    needs: build_docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Pages content
+        run: |
+          mkdir -p site
+          cp -R "Progetto devOps/." site/
+          cp "Progetto devOps/PROGETTO DevOps ( HTML ).html" site/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
