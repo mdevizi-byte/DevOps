@@ -53,7 +53,7 @@ junit 'report.xml'
 }
 post {
 always {
-echo "Pipeline conclusa. Stato finale:
+echo "Pipeline conclusa. Stato finale:"
 
 ${currentBuild.result}"
 
