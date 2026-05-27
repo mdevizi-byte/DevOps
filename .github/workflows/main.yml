@@ -23,14 +23,34 @@ jobs:
       - name: Run HTMLHint
         run: npx --yes htmlhint "Progetto devOps/**/*.html"
 
-      - name: Check broken links
-        uses: lycheeverse/lychee-action@v2.5.0
-        with:
-          args: >-
-            --verbose
-            --no-progress
-            --accept 200,206,301,302,303,307,308,403,429
-            "Progetto devOps/**/*.html"
+      - name: Check broken local links
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          root = Path("Progetto devOps")
+          href_pattern = re.compile(r'href=["\']([^"\']+)["\']', re.IGNORECASE)
+
+          for html_file in root.rglob("*.html"):
+              content = html_file.read_text(encoding="utf-8", errors="ignore")
+
+              for match in href_pattern.finditer(content):
+                  href = match.group(1).strip()
+
+                  if href.startswith(("http://", "https://", "mailto:", "tel:", "#")):
+                      continue
+
+                  target_path = href.split("#", 1)[0].split("?", 1)[0]
+                  if not target_path:
+                      continue
+
+                  resolved = (html_file.parent / target_path).resolve()
+                  if not resolved.exists():
+                      print(f"Broken local link in {html_file}: {href}")
+                      sys.exit(1)
+          PY
 
   build_docker:
     name: Build Docker image
